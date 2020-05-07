@@ -1,46 +1,23 @@
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const PORT = 4000;
 const todoRoutes = express.Router();
+const PORT = 4000;
 
+let Todo = require('./todo.model');
 
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://localhost/user', { useNewUrlParser: true });
-// mongoose.Promise = global.Promise; //for version 4 mongodb
-
+mongoose.connect('mongodb://localhost/todos', { useNewUrlParser: true });
 const connection = mongoose.connection;
-const mongoose = require('mongoose');
-
-const Schema = mongoose.Schema;
-
-let Todo = new Schema({
-    todo_description: {
-        type: String
-    },
-    todo_responsible: {
-        type: String
-    },
-    todo_priority: {
-        type: String
-    },
-    todo_completed: {
-        type: Boolean
-    }
-});
-
-module.exports = mongoose.model('Todo', Todo);
-
 
 connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
 })
-
-app.use('/todos', todoRoutes);
 
 todoRoutes.route('/').get(function(req, res) {
     Todo.find(function(err, todos) {
@@ -73,7 +50,7 @@ todoRoutes.route('/add').post(function(req, res) {
 todoRoutes.route('/update/:id').post(function(req, res) {
     Todo.findById(req.params.id, function(err, todo) {
         if (!todo)
-            res.status(404).send("data is not found");
+            res.status(404).send('data is not found');
         else
             todo.todo_description = req.body.todo_description;
             todo.todo_responsible = req.body.todo_responsible;
@@ -81,7 +58,7 @@ todoRoutes.route('/update/:id').post(function(req, res) {
             todo.todo_completed = req.body.todo_completed;
 
             todo.save().then(todo => {
-                res.json('Todo updated!');
+                res.json('Todo updated');
             })
             .catch(err => {
                 res.status(400).send("Update not possible");
@@ -89,7 +66,14 @@ todoRoutes.route('/update/:id').post(function(req, res) {
     });
 });
 
+app.use('/todos', todoRoutes);
 
 app.listen(PORT, function() {
     console.log("Server is running on Port: " + PORT);
 });
+
+
+
+// mongoose.Promise = global.Promise; //for version 4 mongodb
+
+//run sudo mongod --dbpath ~/data/db
