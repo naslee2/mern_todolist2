@@ -25,6 +25,7 @@ export default class TodosList extends Component {
     componentDidMount() {
         axios.get('http://localhost:4000/todos/')
             .then(response => {
+                console.log(response,"response");
                 this.setState({ todos: response.data }, () => {
                     console.log(this.state.todos, "haha")
                 });
@@ -32,10 +33,6 @@ export default class TodosList extends Component {
             .catch(function (error){
                 console.log(error);
             })
-
-            // if(prevProps.value !== this.props.value) {
-            //     this.setState({value: this.props.value});
-            //   }
     }
 
     todoList() {
